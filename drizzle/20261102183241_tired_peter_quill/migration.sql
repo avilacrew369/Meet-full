@@ -14,6 +14,15 @@ CREATE TABLE "accounts" (
 	"updated_at" timestamp NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "communities" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	"name" varchar(255) NOT NULL,
+	"description" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"creted_by" text NOT NULL,
+	"image" varchar(100) NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "sessions" (
 	"id" text PRIMARY KEY,
 	"expires_at" timestamp NOT NULL,

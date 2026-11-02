@@ -1,5 +1,6 @@
 import DashboardPanel from "@/src/shared/dashboard/DashboardPanel";
 
+export const instant = false
 
 export default function DashbordLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (

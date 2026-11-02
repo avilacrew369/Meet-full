@@ -1,8 +1,10 @@
+
 import { auth } from "./auth";
 import { headers } from "next/headers";
+import { connection } from "next/server";
 
-// export const instant = false;
 export async function getServerSession() {
+    await connection();
 
     const session = await auth.api.getSession({
         headers: await headers(),
@@ -21,4 +23,3 @@ export async function requireAuth() {
         isAuth: session ? true : false
     }
 }
-
