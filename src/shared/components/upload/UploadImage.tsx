@@ -7,8 +7,10 @@ import { CommunityInput } from "@/src/features/communities/schema/communitySchem
 import { FormError } from "../forms"
 
 export default function UploadImage() {
-    const { formState: {errors}, setValue} = useFormContext<CommunityInput>()
+    const { formState: {errors}, setValue, clearErrors, getValues } = useFormContext<CommunityInput>()
     const [uploadedImage, setUploadedImage] = useState('')
+    const [uploadError, setUploadError] = useState('')
+    const currentImage = getValues('image') ? getValues('image') : null
   return (
     <>
          <UploadDropzone 
@@ -17,6 +19,12 @@ export default function UploadImage() {
                     onClientUploadComplete={(res) => {
                         setUploadedImage(res[0].ufsUrl)
                         setValue('image', res[0].ufsUrl, {shouldValidate: true})
+                        clearErrors('image')
+                        setUploadError('')
+                    }}
+                    onUploadError={(error) => {
+                        console.error('Upload error:', error.code, error.message, error.cause)
+                        setUploadError(error.message)
                     }}
                     appearance={{
                         button: "bg-green-500 w-full rounded-none"
@@ -26,7 +34,8 @@ export default function UploadImage() {
                         mode: 'auto'
                     }}
                 />
-            {errors.image && <FormError>{errors.image.message}</FormError>}
+            {uploadError && <FormError>{uploadError}</FormError>}
+            {errors.image &&<FormError>{errors.image.message}</FormError>}
             
 
                    {uploadedImage && (
@@ -37,9 +46,22 @@ export default function UploadImage() {
                                             alt="Imagen Publicada"
                                             width={300}
                                             height={200}
+                                            className="h-auto"
                                         />
                                     </>
                                 )}
+                    {currentImage && !uploadedImage && (
+                            <>
+                                        <p className="text-lg">Imagen Actual</p>
+                                        <Image
+                                            src={currentImage}
+                                            alt="Imagen Publicada"
+                                            width={300}
+                                            height={200}
+                                            className="h-auto"
+                                        />
+                                    </>
+                    )}
     </>
   )
 }

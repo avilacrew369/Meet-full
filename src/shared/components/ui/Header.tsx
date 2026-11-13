@@ -1,10 +1,13 @@
 import Link from "next/link";
 import Logo from "./Logo";
 import GuestNavigation from "./GuestNavigation";
+import { requireAuth } from "@/src/lib/auth-server";
+import UserNavigation from "./UserNavigation";
 
 
 
 export default  async function Header() {
+  const { isAuth } = await requireAuth()
  
   return (
     <header className="border-b border-gray-200">
@@ -16,7 +19,7 @@ export default  async function Header() {
         </div>
       </Link>
     </div>
-    <GuestNavigation />
+    {isAuth ? <UserNavigation /> :<GuestNavigation />}
   </div>
 </header>
   )

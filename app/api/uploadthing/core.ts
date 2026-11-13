@@ -1,4 +1,4 @@
-import { requireAuth } from "@/lib/auth-server";
+import { auth } from "@/lib/auth";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
 
@@ -13,8 +13,11 @@ export const ourFileRouter = {
   })
     .middleware(async ({ req }) => {
       // Este código se ejecuta antes de subir el archivo
-      const { session } = await requireAuth();
-
+      // Pass req.headers directly — avoids next/headers which triggers the
+      // nextCookies plugin's cookies().set() call outside a valid write scope,
+      // which would throw and produce a 400.
+      const session = await auth.api.getSession({ headers: req.headers });
+      console.log('Upload middleware session:', session);
       // Prevenir que usuarios no autenticados no suban imágenes
       if (!session) throw new UploadThingError("Unauthorized");
 

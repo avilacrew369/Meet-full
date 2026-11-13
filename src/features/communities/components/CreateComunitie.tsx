@@ -15,6 +15,7 @@ export default function CreateCommunity() {
     defaultValues: {
       name: '',
       description: '',
+      image: ''
     }
   })
 

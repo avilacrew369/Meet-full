@@ -3,6 +3,7 @@ import Heading from '@/src/shared/components/typography/Heading'
 import { generatePageTitle } from '@/src/shared/utils/metadata'
 import { Metadata } from 'next'
 import Link from 'next/link'
+import { Suspense } from 'react'
 
 export const metadata: Metadata = {
   title: generatePageTitle('Restablecer Password')
@@ -12,7 +13,9 @@ export default function ForgotPasswordPage() {
   return (
     <>
     <Heading >Recupera tu acceso a Meeti</Heading>
-    <SetPasswordForm />
+    <Suspense>
+      <SetPasswordForm />
+    </Suspense>
 
      <nav className="flex justify-between mt-20">
         <Link
