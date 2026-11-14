@@ -3,6 +3,7 @@ import { communityService } from "@/src/features/communities/services/CommunityS
 import { getServerSession } from "@/src/lib/auth-server"
 import Heading from "@/src/shared/components/typography/Heading"
 import { generatePageTitle } from "@/src/shared/utils/metadata"
+import { pluralize } from "@/src/shared/utils/strings"
 import { Metadata } from "next"
 import Image from "next/image"
 
@@ -50,6 +51,10 @@ export default async function CommunityPage(props: PageProps<'/communities/[id]'
             
             <Heading className="text-center"  >{community.data.name}</Heading>
             <p className="text-gray-600 text-lg text-center">{community.data.description}</p>
+            <p className="text-gray-600 text-sm text-center"> 
+              {community.memberCount} {''}
+              {pluralize('Miembro', community.memberCount)}</p>
+
 
           </div>
          
