@@ -1,0 +1,31 @@
+## Error Type
+Blocking Route
+
+## Error Message
+Route "/": Next.js encountered uncached data during prerendering.
+
+`fetch(...)` or `connection()` accessed outside of `<Suspense>` prevents the route from being prerendered, blocking the page load and leading to a slower user experience.
+
+Ways to fix this:
+  - [stream] Provide a placeholder with `<Suspense fallback={...}>` around the data access
+  - [cache] Cache the data access with `"use cache"` (does not apply to `connection()`)
+  - [block] Set `export const instant = false` to allow a blocking route
+
+Learn more: https://nextjs.org/docs/messages/blocking-prerender-dynamic
+
+
+    at getServerSession (src/lib/auth-server.ts:8:21)
+    at requireAuth (src/lib/auth-server.ts:21:27)
+    at Header (src/shared/components/ui/Header.tsx:10:39)
+    at RootLayout (app/(public)/layout.tsx:7:9)
+
+## Code Frame
+   6 | export async function getServerSession() {
+   7 |
+>  8 |     await connection();
+     |                     ^
+   9 |
+  10 |
+  11 |
+
+Next.js version: 16.4.3 (Turbopack)

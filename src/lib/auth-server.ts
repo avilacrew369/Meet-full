@@ -4,7 +4,10 @@ import { headers } from "next/headers";
 import { connection } from "next/server";
 
 export async function getServerSession() {
+
     await connection();
+
+
 
     const session = await auth.api.getSession({
         headers: await headers(),

@@ -22,7 +22,10 @@ export default function CommunityForm() {
             {errors.name && <FormError>{errors.name.message}</FormError>}
 
                 <FormLabel>Imagen Comunidad</FormLabel>
-                <UploadImage />
+                <UploadImage 
+                    uploadedImageLabel="Imagen Publicada Comunidad"
+
+                />
             
             <FormLabel htmlFor="name" >Descripcion  comunidad</FormLabel>
             <FormTextArea

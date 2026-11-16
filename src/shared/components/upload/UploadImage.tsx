@@ -5,9 +5,14 @@ import { twMerge } from "tailwind-merge"
 import { useFormContext } from "react-hook-form"
 import { CommunityInput } from "@/src/features/communities/schema/communitySchema"
 import { FormError } from "../forms"
+import { MeetiInput } from "@/src/features/meetis/schema/meetiSchema"
 
-export default function UploadImage() {
-    const { formState: {errors}, setValue, clearErrors, getValues } = useFormContext<CommunityInput>()
+type Props = {
+    uploadedImageLabel: string
+}
+
+export default function UploadImage({uploadedImageLabel}: Props) {
+    const { formState: {errors}, setValue, clearErrors, getValues } = useFormContext<CommunityInput | MeetiInput>()
     const [uploadedImage, setUploadedImage] = useState('')
     const [uploadError, setUploadError] = useState('')
     const currentImage = getValues('image') ? getValues('image') : null
@@ -40,13 +45,14 @@ export default function UploadImage() {
 
                    {uploadedImage && (
                                     <>
-                                        <p className="text-lg">Imagen Nueva</p>
+                                        <p className="text-lg">{uploadedImageLabel}</p>
                                         <Image
                                             src={uploadedImage}
                                             alt="Imagen Publicada"
                                             width={300}
                                             height={200}
                                             className="h-auto"
+                                            loading="eager"
                                         />
                                     </>
                                 )}
@@ -59,6 +65,7 @@ export default function UploadImage() {
                                             width={300}
                                             height={200}
                                             className="h-auto"
+                                            loading="eager"
                                         />
                                     </>
                     )}

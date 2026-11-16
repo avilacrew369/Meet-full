@@ -1,0 +1,121 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { Marker as TMarker, LatLngTuple } from 'leaflet';
+import { Icon } from  'leaflet'
+import 'leaflet/dist/leaflet.css';
+import { MapContainer, TileLayer, useMap, Marker, Popup } from 'react-leaflet';
+import { FormError, FormInput, FormLabel } from '@/shared/components/forms';
+import { useFormContext } from 'react-hook-form';
+import { GeoCodeSchema, MeetiInput } from '../schema/meetiSchema';
+
+function CenterMap({ coordinates }: { coordinates: LatLngTuple }) {
+  const map = useMap()
+  useEffect(() => {
+    map.setView([coordinates[0], coordinates[1]]);
+  }, [coordinates, map]);
+  return null;
+}
+
+const markerIcon = new Icon({
+  iconUrl: "/marker-icon.png",
+  shadowUrl: "/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+})
+
+
+export default function LocationPicker() {
+
+  const {register, getValues, setValue, formState: {errors}, clearErrors} = useFormContext<MeetiInput>()
+
+  const lat = getValues('location.lat') ?? 25.776311
+  const lng = getValues('location.lng') ??  -80.3121477
+  
+
+  const [coordinates, setCoordinates] = useState<LatLngTuple>([lat, lng]);
+
+  // Next (cacheComponents) oculta las páginas con <Activity> en lugar de desmontarlas.
+  // Al ocultarse, react-leaflet destruye el mapa (map.remove()) pero no lo vuelve a crear
+  // al mostrarse, así que montamos un MapContainer nuevo cada vez que la página es visible.
+  const [mapVisible, setMapVisible] = useState(false);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sincroniza con el ciclo de vida del mapa de Leaflet
+    setMapVisible(true);
+    return () => setMapVisible(false);
+  }, []);
+
+  const markerRef = useRef<TMarker>(null);
+  const ZOOM = 16;
+  const GEOCODE_URL = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?f=pjson&langCode=ES&location=";
+
+  const reverseGeocoding = async (positionTuple: LatLngTuple) => {
+    const url = GEOCODE_URL + `${positionTuple[1]},${positionTuple[0]}`
+    const data = await (await fetch(url)).json();
+    const location = GeoCodeSchema.parse(data.address)
+
+    setValue('location.address', location.LongLabel)
+    setValue('location.city', location.City)
+    setValue('location.country', location.CntryName)
+    setValue('location.lat', location.InputY)
+    setValue('location.lng', location.InputX)
+
+    const values = getValues()
+
+    clearErrors('location.address')
+
+
+  }
+
+
+  const eventHandlers = useMemo(() => ({
+    dragend() {
+      const marker = markerRef.current;
+      if (marker !== null) {
+        const latLng = marker.getLatLng();
+        const positionTuple: LatLngTuple = [latLng.lat, latLng.lng];
+        setCoordinates(positionTuple);
+        reverseGeocoding(positionTuple)
+      }
+    },
+  }), [reverseGeocoding]);
+
+
+
+  return (
+    <>
+      {mapVisible ? (
+      <MapContainer center={coordinates} zoom={ZOOM} scrollWheelZoom={true} className='h-96 w-full'>
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <Marker
+          draggable={true}
+          position={coordinates}
+          icon={markerIcon}
+          eventHandlers={eventHandlers}
+          ref={markerRef}
+        >
+          <Popup>Dirección aquí</Popup>
+        </Marker>
+
+        <CenterMap coordinates={coordinates} />
+      </MapContainer>
+      ) : (
+        <div className='h-96 w-full' />
+      )}
+
+      <FormLabel htmlFor="address">Dirección:</FormLabel>
+      <FormInput
+        id="address"
+        type="text"
+        placeholder="Dirección Evento"
+        className="disabled:opacity-50 "
+        disabled
+        {...register('location.address')}
+      />
+       {'location' in errors && errors.location?.address && (
+                <FormError>{errors.location.address.message}</FormError>)}
+
+    </>
+  )
+}
