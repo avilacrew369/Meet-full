@@ -9,12 +9,14 @@ import { notFound } from "next/navigation";
 import { checkPassword } from "@/src/shared/utils/auth";
 import { deleteUTFiles } from "@/src/lib/uploadthing-server";
 import { IMenbershipRepository, membershipRepository } from "./MembershipRepository";
+import { IMeetiRepository, meetiRepository } from "../../meetis/services/MeetiRepository";
 
 
 class CommunityService {
     constructor (
         private communityRepository: ICommunityRepository,
-        private membershipRepository: IMenbershipRepository
+        private membershipRepository: IMenbershipRepository,
+        private meetiRepository: IMeetiRepository
     ) {}
     async createCommunity(data : CommunityInput, userId: string){
         const community = await this.communityRepository.create({
@@ -137,6 +139,9 @@ class CommunityService {
         }
 
     }
+     async getUpcomingMeetisByCommunity(communityId: string) {
+        return await this.meetiRepository.findUpcomingByCommunity(communityId)
+    }
 }
 
-export const communityService = new CommunityService(communityRepository, membershipRepository)
+export const communityService = new CommunityService(communityRepository, membershipRepository, meetiRepository)

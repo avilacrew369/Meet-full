@@ -22,7 +22,8 @@ export default async function MeetisPage() {
     const { session } = await requireAuth()
     if (!session) redirect('/auth/login')
 
-     const meetis = await meetiService.getUpcomingMeetiByUser(session.user)
+    
+        const meetis = await meetiService.getUpcomingMeetiByUser(session.user)
 
     return (
         <>

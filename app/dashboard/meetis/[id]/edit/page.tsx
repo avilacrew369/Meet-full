@@ -3,16 +3,19 @@ import EditMeeti from "@/src/features/meetis/components/EditMeeti";
 import { meetiService } from "@/src/features/meetis/services/MeetiService";
 import { requireAuth } from "@/src/lib/auth-server";
 import Heading from "@/src/shared/components/typography/Heading";
+import { generatePageTitle } from "@/src/shared/utils/metadata";
+import { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-export async function generateMetadata({params} : PageProps<'/dashboard/meetis/[id]/edit'>) {
+export async function generateMetadata({params} : PageProps<'/dashboard/meetis/[id]/edit'>) : Promise<Metadata> {
     const { id } = await params
     const meeti = await meetiService.getMeetiById(id)
     return {
-        title: `Editar Meeti: ${meeti.title}`
+        title: generatePageTitle(`Editar Meeti: ${meeti.title}`)
+           }
     }
-}
+
 
 export default async function EditMeetiPage(props: PageProps<'/dashboard/meetis/[id]/edit'>) {
 

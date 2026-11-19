@@ -1,7 +1,7 @@
 
 import { db } from "@/src/db"
 import { meeti, meetiLocations } from "@/src/db/schema"
-import { InsertMeeti, InsertMeetiLocation, SelectMeeti } from "../types/meeti.types"
+import { FullMeeti, InsertMeeti, InsertMeetiLocation, SelectMeeti } from "../types/meeti.types"
 import { User } from "better-auth"
 import { format } from "date-fns"
 import { eq } from "drizzle-orm"
@@ -10,7 +10,9 @@ export interface IMeetiRepository {
     insert(data: InsertMeeti) : Promise<void>
     findUpcomingByUserId(userId: string) : Promise<SelectMeeti[]>
     findById(id: string) : Promise<SelectMeeti | null>
+    findFullById(id: string) : Promise<FullMeeti | null>
     update(data: InsertMeeti, meetiId: string) : Promise<void>
+    findUpcomingByCommunity(communityId: string) : Promise<SelectMeeti[]>
     
     
 }
@@ -67,6 +69,20 @@ class MeetiRepository implements IMeetiRepository {
        })
        return result ?? null
    }
+    async findFullById(id: string) {
+       const result = await db.query.meeti.findFirst({
+            where: {
+                id
+            },
+            with: {
+                location: true,
+                category: true,
+                community: true,
+                admin: true
+            }
+       })
+       return result ?? null
+   }
    async update(data: InsertMeeti, meetiId: string): Promise<void> {
         const [updateMeeti]  =  await db.update(meeti).set(data)
             .where(eq(meeti.id, meetiId))
@@ -88,6 +104,23 @@ class MeetiRepository implements IMeetiRepository {
             await this.insertLocation({ meetiId: updateMeeti.id,...data.location})
         }
     } 
+   }
+   async findUpcomingByCommunity(communityId: string): Promise<SelectMeeti[]> {
+        const today = format(new Date(), 'yyyy-MM-dd') 
+       return db.query.meeti.findMany({
+        where: {
+            communityId,
+            date: {
+                gte: today
+            }
+
+        },
+        limit: 3,
+        orderBy: {
+            date: 'asc'
+        }
+
+       })
    }
    
    }

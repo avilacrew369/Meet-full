@@ -1,4 +1,4 @@
-import { category, meeti, meetiLocations } from "@/src/db/schema";
+import { category, meeti, meetiAttendees, meetiLocations } from "@/src/db/schema";
 import { SelectCommunity } from "@/src/features/communities/types/community.types";
 import { User } from "better-auth"
 
@@ -28,5 +28,14 @@ export type FullMeeti = SelectBasicMeeti & {
 export type MeetiPermitions = {
     canConfirm: boolean
     canCancel: boolean
+}
+
+export type SelectMeetiAttendee = typeof meetiAttendees.$inferSelect
+export type SelectMeetiAttendeeWithUser = SelectMeetiAttendee & {
+    user: {
+        id: User['id']
+        name: User['name'],
+        email: User['email']
+    }
 }
 

@@ -2,7 +2,9 @@
 
 import { authService } from "../services/AuthService";
 import { ForgotPasswordInput, ForgotPasswordSchema, SetPasswordInput, SetPasswordSchema, SignInInput, SignInSchema, SignUpInput, SignUpSchema } from "../schemas/authSchema";
-import { success } from "zod";
+import { getClientIp } from "@/src/shared/utils/ip";
+import { ratelimit } from "@/src/lib/limiter";
+import { getMinutesDiffFromNow } from "@/src/shared/utils/date";
 
 export type SignUpActionResult = {
     error: string;
@@ -10,6 +12,19 @@ export type SignUpActionResult = {
 };
 
 export async function signUpAction(input: SignUpInput): Promise<SignUpActionResult> {
+
+
+
+    const ip = await getClientIp()
+    const { success, reset } = await ratelimit.limit(ip)
+
+    if (!success) {
+        return {
+            error: `Limite Alcanzado. intenta en ${getMinutesDiffFromNow(reset)} Minutos`,
+            success: ''
+        }
+    }
+
     const data = SignUpSchema.safeParse(input);
 
     if (!data.success) {
@@ -21,9 +36,19 @@ export async function signUpAction(input: SignUpInput): Promise<SignUpActionResu
 
     const response = await authService.register(data.data)
     return response
-    
+
 }
 export async function signInAction(input: SignInInput) {
+
+    const ip = await getClientIp()
+    const { success, reset } = await ratelimit.limit(ip)
+
+    if (!success) {
+        return {
+            error: `Limite Alcanzado. intenta en ${getMinutesDiffFromNow(reset)} Minutos`,
+            success: ''
+        }
+    }
 
     const data = SignInSchema.safeParse(input)
     if (!data.success) {
@@ -36,6 +61,16 @@ export async function signInAction(input: SignInInput) {
     return response
 }
 export async function forgotPasswordAction(input: ForgotPasswordInput) {
+
+    const ip = await getClientIp()
+    const { success, reset } = await ratelimit.limit(ip)
+
+    if (!success) {
+        return {
+            error: `Limite Alcanzado. intenta en ${getMinutesDiffFromNow(reset)} Minutos`,
+            success: ''
+        }
+    }
 
 
     const data = ForgotPasswordSchema.safeParse(input)
@@ -51,6 +86,16 @@ export async function forgotPasswordAction(input: ForgotPasswordInput) {
 }
 
 export async function setPasswordAction(input: SetPasswordInput, token: string) {
+
+    const ip = await getClientIp()
+    const { success, reset } = await ratelimit.limit(ip)
+
+    if (!success) {
+        return {
+            error: `Limite Alcanzado. intenta en ${getMinutesDiffFromNow(reset)} Minutos`,
+            success: ''
+        }
+    }
     const data = SetPasswordSchema.safeParse(input)
     if (!data.success) {
         return {
@@ -58,7 +103,7 @@ export async function setPasswordAction(input: SetPasswordInput, token: string) 
             success: ''
         }
     }
-    
+
     const response = await authService.confirmPasswordReset(data.data, token)
     return response
 }

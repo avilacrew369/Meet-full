@@ -1,0 +1,174 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "fa3da794-e0da-43a3-a10c-b9c59fb06125",
+  "prevIds": [
+    "d49d6223-38b4-4ba0-b834-78b1384cfdca"
+  ],
+  "footprints": [
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "meeti_attendds"
+      ],
+      "writes": [
+        "s|tbl|public.meeti_attendds",
+        "n|tbl|public.meeti_attendds",
+        "e|tbl|public.meeti_attendds",
+        "n|rel|public.meeti_attendds",
+        "n|type|public.meeti_attendds"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "meeti_attendds"
+      ],
+      "writes": [
+        "s|fk|public.meeti_attendds.meeti_attendds_meeti_id_meetis_id_fkey",
+        "n|fk|public.meeti_attendds.meeti_attendds_meeti_id_meetis_id_fkey",
+        "e|fk|public.meeti_attendds.meeti_attendds_meeti_id_meetis_id_fkey",
+        "n|con|public.meeti_attendds.meeti_attendds_meeti_id_meetis_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.meeti_attendds",
+        "n|sch|public",
+        "n|tbl|public.meetis",
+        "n|sch|public",
+        "n|col|public.meeti_attendds.meeti_id",
+        "n|col|public.meetis.id",
+        "e|uniqueness|public.meetis.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "meeti_attendds"
+      ],
+      "writes": [
+        "s|fk|public.meeti_attendds.meeti_attendds_user_id_users_id_fkey",
+        "n|fk|public.meeti_attendds.meeti_attendds_user_id_users_id_fkey",
+        "e|fk|public.meeti_attendds.meeti_attendds_user_id_users_id_fkey",
+        "n|con|public.meeti_attendds.meeti_attendds_user_id_users_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.meeti_attendds",
+        "n|sch|public",
+        "n|tbl|public.users",
+        "n|sch|public",
+        "n|col|public.meeti_attendds.user_id",
+        "n|col|public.users.id",
+        "e|uniqueness|public.users.id"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "meeti_attendds",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "meeti_attendds",
+        "name": "meeti_id",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "meeti_attendds",
+        "name": "user_id",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "meeti_attendds",
+        "name": "created_at",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "meeti_attendds",
+        "name": "meeti_attendds_meeti_id_meetis_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "meeti_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "meetis",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "CASCADE",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "meeti_attendds",
+        "name": "meeti_attendds_user_id_users_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "user_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "users",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "CASCADE",
+        "entityType": "fks"
+      }
+    }
+  ]
+}
