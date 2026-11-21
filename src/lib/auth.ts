@@ -28,6 +28,14 @@ export const auth = betterAuth({
             await AuthEmailService.sendVerificationEmail({ name, email, url})
         }
     },
+    user: {
+        additionalFields: {
+            bio: {
+                type: 'string',
+                required: false,
+            }
+        }
+    },
   
     plugins: [nextCookies()],
 })

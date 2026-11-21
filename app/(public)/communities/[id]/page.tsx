@@ -1,30 +1,40 @@
 import CommunityActionsPanel from "@/src/features/communities/components/CommunityActionsPanel"
 import UpcomingCommunityMeetis from "@/src/features/communities/components/UpcomingCommunityMeetis"
 import { communityService } from "@/src/features/communities/services/CommunityService"
+import OrganizerCard from "@/src/features/meetis/components/OrganizerCard"
 import { getServerSession } from "@/src/lib/auth-server"
 import Heading from "@/src/shared/components/typography/Heading"
 import { generatePageTitle } from "@/src/shared/utils/metadata"
 import { pluralize } from "@/src/shared/utils/strings"
 import { Metadata } from "next"
 import Image from "next/image"
+import { cache } from "react"
+
+
 
 export const instant = false
+
+const getCommunityDetailsCached = cache( async (id: string) => {
+  const session = (await getServerSession())
+  const community = await communityService.getComunityDetails(id, session?.user)
+   return community
+})
 
 export async function generateMetadata({params} :
            PageProps<'/communities/[id]'>) : Promise<Metadata>  {
   const {id } = await params
-  const community = await communityService.getCommunity(id)
-
+  const community = await getCommunityDetailsCached(id)
+    
   return {
-    title: generatePageTitle(`comunidad ${community.name}`)
+    title: generatePageTitle(`comunidad ${community.data.name}`)
   }
 }
 
 export default async function CommunityPage(props: PageProps<'/communities/[id]'>) {
 
   const { id } = await props.params
-  const session = await getServerSession()
-  const community = await communityService.getComunityDetails(id, session?.user)
+  
+  const community = await getCommunityDetailsCached(id,)
   return (
     <> 
       <main className="max-auto space-y-5 p-10">
@@ -54,9 +64,15 @@ export default async function CommunityPage(props: PageProps<'/communities/[id]'
             <p className="text-gray-600 text-lg text-center">{community.data.description}</p>
             <p className="text-gray-600 text-sm text-center"> 
               {community.memberCount} {''}
-              {pluralize('Miembro', community.memberCount)}</p>
-
-
+              {pluralize('Miembro', community.memberCount)}
+            </p>
+          </div>
+          <div className="bg-slate-100 p-5 rounded-2xl">
+            <OrganizerCard 
+              organizer={community.data.admin}
+            
+            />
+            {/* Admin Aquí */}
           </div>
          
         </div>

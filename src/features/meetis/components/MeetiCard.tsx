@@ -6,9 +6,11 @@ import { SelectMeeti } from "../types/meeti.types";
 
 type Props = {
     meeti: SelectMeeti
+    /** Cards above the fold load eagerly: one of them is usually the LCP element */
+    eager?: boolean
 }
 
-export default function MeetiCard({meeti} : Props) {
+export default function MeetiCard({meeti, eager = false} : Props) {
   return (
     <div className="border border-slate-200  hover:shadow-2xl transition-shadow">
       <div className="overflow-hidden">
@@ -16,7 +18,8 @@ export default function MeetiCard({meeti} : Props) {
           className="object-cover h-72 w-full transition-transform duration-300 ease-in-out hover:scale-120"
           src={meeti.image}
           width={400}
-          height={600}
+          height={400}
+          loading={eager ? "eager" : "lazy"}
           alt={`Imagen Meeti ${meeti.title}`}
         />
       </div>

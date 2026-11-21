@@ -5,15 +5,18 @@ import { FullMeeti, InsertMeeti, InsertMeetiLocation, SelectMeeti } from "../typ
 import { User } from "better-auth"
 import { format } from "date-fns"
 import { eq } from "drizzle-orm"
+import { io } from "next/cache"
+import { connection } from "next/server"
 
 export interface IMeetiRepository {
     insert(data: InsertMeeti) : Promise<void>
     findUpcomingByUserId(userId: string) : Promise<SelectMeeti[]>
+    findUpcoming() : Promise<SelectMeeti[]>
     findById(id: string) : Promise<SelectMeeti | null>
     findFullById(id: string) : Promise<FullMeeti | null>
     update(data: InsertMeeti, meetiId: string) : Promise<void>
     findUpcomingByCommunity(communityId: string) : Promise<SelectMeeti[]>
-    
+    findByCategory(categoryId: string) : Promise<SelectMeeti[]>
     
 }
 
@@ -39,6 +42,7 @@ class MeetiRepository implements IMeetiRepository {
    }
 
    async findUpcomingByUserId(userId: string): Promise<SelectMeeti[]> {
+        await io()
         const today = format(new Date(), 'yyyy-MM-dd')
         
         const result = await db.query.meeti.findMany({
@@ -57,7 +61,32 @@ class MeetiRepository implements IMeetiRepository {
        })
        return result
    }
-
+   async findUpcoming(): Promise<SelectMeeti[]> {
+        await io()
+        const now = new Date()
+        const nowDate = now.toISOString().slice(0, 10)
+        const nowTime = now.toTimeString().slice(0, 5)
+    
+        const result = await db.query.meeti.findMany({
+        where: {
+            OR: [
+                {date: {gt: nowDate}},
+                {
+                    AND: [
+                        {date: {eq: nowDate}},
+                        {time: {gte: nowTime}}
+                    ]
+                }
+            ]
+        },
+        orderBy: {
+            date: 'asc',
+            time: 'asc'
+        },
+        limit: 3
+       })
+       return result
+   }
    async findById(id: string) {
        const result = await db.query.meeti.findFirst({
         where: {
@@ -106,6 +135,7 @@ class MeetiRepository implements IMeetiRepository {
     } 
    }
    async findUpcomingByCommunity(communityId: string): Promise<SelectMeeti[]> {
+        await io()
         const today = format(new Date(), 'yyyy-MM-dd') 
        return db.query.meeti.findMany({
         where: {
@@ -121,6 +151,39 @@ class MeetiRepository implements IMeetiRepository {
         }
 
        })
+   }
+     async findByCategory(categoryId: string): Promise<SelectMeeti[]> {
+        await connection()
+       const today = format(new Date(), 'yyyy-MM-dd')
+       const result = await db.query.meeti.findMany({
+        where: {
+            categoryId,
+            date: {
+                gte: today
+            }
+        },
+        orderBy: {
+            date: 'asc'
+        },
+        limit: 10
+       })
+       return result
+   }
+   async delete(meetiId: string): Promise<void> {
+    await db.delete(meeti).where(eq(meeti.id, meetiId))
+       
+   }
+   async searchByTopic(query: string): Promise<SelectMeeti[]> {
+    const meetis = await db.query.meeti.findMany({
+        where: {
+            OR: [
+                {title: {ilike: `%${query}%`} },
+                {details: {ilike: `%${query}%`}},
+            ]
+        }
+    })
+    return meetis
+       
    }
    
    }

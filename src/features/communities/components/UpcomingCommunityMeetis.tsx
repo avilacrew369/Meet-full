@@ -15,8 +15,8 @@ export default async function UpcomingCommunityMeetis({ communityId }: Props) {
         Proximos Meetis de esta Comunidad
       </Heading>
       <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-5 p-5 lg:p-0">
-        {meetis.length ? meetis.map(meeti => (
-          <MeetiCard key={meeti.id} meeti={meeti}  />
+        {meetis.length ? meetis.map((meeti, index) => (
+          <MeetiCard key={meeti.id} meeti={meeti} eager={index < 3} />
         ))
         :  <p className="text-center py-10  text-lg text-gray-600 col-span-1 lg:col-span-3">No Hay Próximos Meetis en esta comunidad</p>
         }

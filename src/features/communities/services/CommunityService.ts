@@ -10,13 +10,15 @@ import { checkPassword } from "@/src/shared/utils/auth";
 import { deleteUTFiles } from "@/src/lib/uploadthing-server";
 import { IMenbershipRepository, membershipRepository } from "./MembershipRepository";
 import { IMeetiRepository, meetiRepository } from "../../meetis/services/MeetiRepository";
+import { IProfileRepository, profileRepository } from "../../profile/services/ProfileRepository";
 
 
 class CommunityService {
     constructor (
         private communityRepository: ICommunityRepository,
         private membershipRepository: IMenbershipRepository,
-        private meetiRepository: IMeetiRepository
+        private meetiRepository: IMeetiRepository,
+        private profileRepository: IProfileRepository
     ) {}
     async createCommunity(data : CommunityInput, userId: string){
         const community = await this.communityRepository.create({
@@ -75,11 +77,11 @@ class CommunityService {
     async getComunityDetails(communityId: string, user? : User) {
         const community = await this.getCommunity(communityId)
         const memberCount = await this.membershipRepository.getMemberCount(community.id)
-
+        const admin = await this.profileRepository.findById(community.createdBy)
 
         if(!user) {
             return {
-                data: community,
+                data: {...community, admin},
                 memberCount,
                 context: null,
                 permissions: null
@@ -89,7 +91,7 @@ class CommunityService {
         const isAdmin = CommunityPolicy.isAdmin(user, community)
 
         return {
-            data: community,
+            data: {...community, admin},
             memberCount,
             context: {
                 isMember,
@@ -142,6 +144,12 @@ class CommunityService {
      async getUpcomingMeetisByCommunity(communityId: string) {
         return await this.meetiRepository.findUpcomingByCommunity(communityId)
     }
+    async getFeaturedCommunities() {
+        return this.communityRepository.findFeatured()
+    }
 }
 
-export const communityService = new CommunityService(communityRepository, membershipRepository, meetiRepository)
+export const communityService = new CommunityService(communityRepository,
+                                 membershipRepository, 
+                                 meetiRepository,
+                                 profileRepository)

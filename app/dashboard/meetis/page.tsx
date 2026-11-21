@@ -50,7 +50,6 @@ export default async function MeetisPage() {
                             width={400}
                             height={250}
                             className="w-40"
-                            priority
                          />
                         <div className="min-w-0 flex-auto">
                             <Link

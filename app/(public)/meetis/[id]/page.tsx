@@ -73,7 +73,7 @@ export default async function MeetiPage(props: PageProps<'/meetis/[id]'>) {
                 {!session?.user && (
                     <p className="font-bold text-orange-500 border-2 border-black p-2">Confirma tu asistencia, obteniendo una cuenta. Es Gratis</p>
                 )}
-                {meeti.permission  && (
+                {meeti.permission  && !meeti.context.isAdmin && (
                         <AttendanceToogleBotton 
                         meetiId={meeti.data.id}
                         permissions={meeti.permission}    
@@ -91,7 +91,6 @@ export default async function MeetiPage(props: PageProps<'/meetis/[id]'>) {
                         height={600}
                         className="w-auto h-auto"
                         loading="eager"
-                        priority
                     />
                     <p className="mt-5 text-lg"> {meeti.data.details}</p>
                 </section>

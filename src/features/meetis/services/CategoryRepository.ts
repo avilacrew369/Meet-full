@@ -20,6 +20,7 @@ class CategoryRepository implements ICategoryRepository {
                 .from(category)
                 .where(eq(category.id, categoryId))
                 .limit(1)
+               
        return  result
     }
 

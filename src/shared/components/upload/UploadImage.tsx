@@ -6,13 +6,14 @@ import { useFormContext } from "react-hook-form"
 import { CommunityInput } from "@/src/features/communities/schema/communitySchema"
 import { FormError } from "../forms"
 import { MeetiInput } from "@/src/features/meetis/schema/meetiSchema"
+import { ProfileInput } from "@/src/features/profile/schemas/profileSchema"
 
 type Props = {
     uploadedImageLabel: string
 }
 
 export default function UploadImage({uploadedImageLabel}: Props) {
-    const { formState: {errors}, setValue, clearErrors, getValues } = useFormContext<CommunityInput | MeetiInput>()
+    const { formState: {errors}, setValue, clearErrors, getValues } = useFormContext<CommunityInput | MeetiInput | ProfileInput>()
     const [uploadedImage, setUploadedImage] = useState('')
     const [uploadError, setUploadError] = useState('')
     const currentImage = getValues('image') ? getValues('image') : null
