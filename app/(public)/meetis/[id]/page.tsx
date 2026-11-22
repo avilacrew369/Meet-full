@@ -9,12 +9,15 @@ import { generatePageTitle } from "@/src/shared/utils/metadata"
 import { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
+import { cache } from "react"
 
 export const instant = false
 
+const getMeetiDetails = cache(meetiService.getMeetiWithDetails.bind(meetiService))
+
 export async function generateMetadata({ params }: PageProps<'/meetis/[id]'>): Promise<Metadata> {
     const { id } = await params
-    const meeti = await meetiService.getMeetiById(id)
+    const { data: meeti } = await getMeetiDetails(id)
     return {
         title: generatePageTitle(`${meeti.title}`),
         openGraph: {
@@ -40,9 +43,18 @@ export default async function MeetiPage(props: PageProps<'/meetis/[id]'>) {
 
     
     const { id } = await props.params
-    const meeti = await meetiService.getMeetiWithDetails(id, session?.user)
+    const meeti = await getMeetiDetails(id, session?.user)
 
-    if(meeti.context.isPastMeeti) throw new Error('Meeti No Disponible')
+    // Don't throw here: production hides thrown messages (React error #441).
+    if(meeti.context.isPastMeeti) {
+        return (
+            <div className="py-10 text-center space-y-5">
+                <Heading>Meeti No Disponible</Heading>
+                <p className="text-gray-600">Este Meeti ya se realizó.</p>
+                <Link href="/" className="font-black">Ir Al Inicio</Link>
+            </div>
+        )
+    }
 
     const {virtual: isVirtual, location} = meeti.data
 

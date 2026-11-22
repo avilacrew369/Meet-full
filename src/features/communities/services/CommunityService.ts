@@ -6,6 +6,7 @@ import { CommunityPolicy } from "@/app/dashboard/policies/CommunityPolicies";
 import { MembershipPolicy } from "@/app/dashboard/policies/MembershipPolicy";
 import { CommunityWithPermissions } from "../types/community.types";
 import { notFound } from "next/navigation";
+import { isUUID } from "@/src/shared/utils/ids";
 import { checkPassword } from "@/src/shared/utils/auth";
 import { deleteUTFiles } from "@/src/lib/uploadthing-server";
 import { IMenbershipRepository, membershipRepository } from "./MembershipRepository";
@@ -69,6 +70,7 @@ class CommunityService {
     }
 
     async getCommunity(communityId: string) {
+        if(!isUUID(communityId)) notFound()
         const community = await this.communityRepository.findById(communityId)
         if(!community) notFound()
         return community

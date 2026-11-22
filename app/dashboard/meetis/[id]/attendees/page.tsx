@@ -1,13 +1,18 @@
+import { MeetiPolicy } from "@/src/features/meetis/policies/MeetiPolicy"
 import { meetiService } from "@/src/features/meetis/services/MeetiService"
 import { requireAuth } from "@/src/lib/auth-server"
 import Heading from "@/src/shared/components/typography/Heading"
 import { generatePageTitle } from "@/src/shared/utils/metadata"
 import { Metadata } from "next"
-import { redirect } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
+import { cache } from "react"
+
+const getMeeti = cache(meetiService.findMeeti.bind(meetiService))
 
 export async function generateMetadata({params} : PageProps<'/dashboard/meetis/[id]/attendees'>) : Promise<Metadata> {
     const { id } = await params
-    const meeti = await meetiService.getMeetiById(id)
+    const meeti = await getMeeti(id)
+    if(!meeti) notFound()
     return {
         title: generatePageTitle(`Asistentes confirmados al Meeti: ${meeti.title}`)
     }
@@ -19,7 +24,12 @@ export default async function MeetiAttendeesPage( { params } : PageProps<'/dashb
     if (!session) redirect('/auth/login')
 
   const { id } = await params
-  const { meeti, attendees} = await meetiService.getMeetiAttendees(id, session.user)
+  const meeti = await getMeeti(id)
+  if(!meeti) notFound()
+  // Don't throw: production hides thrown messages (React error #441).
+  if(!MeetiPolicy.canViewAttendes(session.user, meeti)) redirect('/dashboard/meetis')
+
+  const attendees = await meetiService.getMeetiAttendees(meeti.id)
 
   return (
        <>

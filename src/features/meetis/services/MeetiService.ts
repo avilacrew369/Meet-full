@@ -7,6 +7,8 @@ import { MeetiPolicy } from "../policies/MeetiPolicy"
 import { IMeetiAttendeesRepository, meetiAttendeesRepository } from "./MeetiAttendeesRepository"
 import { MeetiAttendeePolicy } from "../policies/MeetiAttendeePolicy"
 import { deleteUTFiles } from "@/src/lib/uploadthing-server"
+import { isUUID } from "@/src/shared/utils/ids"
+import { notFound } from "next/navigation"
 
 
 class MeetiService {
@@ -48,16 +50,22 @@ class MeetiService {
     async getUpcoming() {
         return await this.meetiRepository.findUpcoming()
     }
+    // Returns null for unknown or malformed IDs, so pages can call notFound().
+    async findMeeti(meetiId: string) {
+        if (!isUUID(meetiId)) return null
+        return await this.meetiRepository.findById(meetiId)
+    }
     async getMeetiById(meetiId: string) {
-        const meeti = await this.meetiRepository.findById(meetiId)
+        const meeti = await this.findMeeti(meetiId)
         if(!meeti) throw new Error('Meeti No Encontrado')
         return meeti
     }
      async getMeetiWithDetails(meetiId: string, user?: User) {
+        if (!isUUID(meetiId)) notFound()
 
         const meeti = await this.meetiRepository.findFullById(meetiId)
 
-        if (!meeti) throw new Error('Meeti no encontrado')
+        if (!meeti) notFound()
 
         const isPastMeeti = MeetiPolicy.isPastMeeti(meeti)
 
@@ -78,6 +86,7 @@ class MeetiService {
             data: meeti,
             context: {
                 isAdmin,
+                isPastMeeti,
                 isAttending
             },
             permission: {
@@ -119,18 +128,9 @@ class MeetiService {
                 
 
         }
-     async getMeetiAttendees(meetiId: string, user: User ) {
-        const meeti = await this.getMeetiById(meetiId)
-        if(!MeetiPolicy.canViewAttendes(user, meeti)) {
-            throw new Error('No Autorizado')
-        }
-
-        const attendees = await this.meetiAttendeesRepository.findAttendeesByMeetiId(meeti.id)
-
-        return {
-            meeti,
-            attendees
-        }
+     // Callers must check MeetiPolicy.canViewAttendes first.
+     async getMeetiAttendees(meetiId: string) {
+        return await this.meetiAttendeesRepository.findAttendeesByMeetiId(meetiId)
     }
      async getMeetisByCategory(categoryId: string) {
         return await this.meetiRepository.findByCategory(categoryId)
