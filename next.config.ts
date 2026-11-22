@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   typedRoutes: true,
+  // Hostnames (no scheme/port) allowed to request dev-only assets; LAN IP for phone testing.
+  allowedDevOrigins: ["192.168.0.142"],
   images: {
     remotePatterns: [
       {

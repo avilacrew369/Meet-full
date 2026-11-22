@@ -17,7 +17,7 @@ export interface IMeetiRepository {
     update(data: InsertMeeti, meetiId: string) : Promise<void>
     findUpcomingByCommunity(communityId: string) : Promise<SelectMeeti[]>
     findByCategory(categoryId: string) : Promise<SelectMeeti[]>
-    
+     delete(meetiId: string) : Promise<void>
 }
 
 class MeetiRepository implements IMeetiRepository {

@@ -7,6 +7,7 @@ import { AuthEmailService } from '../emails/services/AuthEmailService'
 
 
 export const auth = betterAuth({
+    trustedOrigins: process.env.TRUSTED_ORIGINS?.split(',').map(origin => origin.trim()).filter(Boolean) ?? [],
     database: drizzleAdapter(db, {
         provider: 'pg',
         usePlural: true,

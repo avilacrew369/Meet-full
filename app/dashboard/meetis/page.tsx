@@ -10,6 +10,7 @@ import Link from "next/link"
 import { redirect } from "next/navigation"
 import { pluralize } from "@/src/shared/utils/strings"
 import MeetiDropdownMenu from "@/src/features/meetis/components/MeetiDropdownMenu"
+import DeleteMeetiDialog from "@/src/features/meetis/components/DeleteMeetiDialog"
 
 const title = 'Administra tus Meetis'
 
@@ -86,6 +87,7 @@ export default async function MeetisPage() {
             </p >
 
              )} 
+             <DeleteMeetiDialog />
         </>
     )
 }

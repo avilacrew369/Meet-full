@@ -6,6 +6,7 @@ import { CommunityPolicy } from "@/app/dashboard/policies/CommunityPolicies"
 import { MeetiPolicy } from "../policies/MeetiPolicy"
 import { IMeetiAttendeesRepository, meetiAttendeesRepository } from "./MeetiAttendeesRepository"
 import { MeetiAttendeePolicy } from "../policies/MeetiAttendeePolicy"
+import { deleteUTFiles } from "@/src/lib/uploadthing-server"
 
 
 class MeetiService {
@@ -133,6 +134,24 @@ class MeetiService {
     }
      async getMeetisByCategory(categoryId: string) {
         return await this.meetiRepository.findByCategory(categoryId)
+    }
+    async deleteMeeti(meetiId: string, user: User) {
+        // optener el Meeti
+        const meeti = await this.getMeetiById(meetiId)
+
+        //Revisar Permisos
+        if(!MeetiPolicy.canDelete(user, meeti)) {
+            throw new Error('No tienes Permisos Para eliminar')
+        }
+
+        // Eliminar
+        await this.meetiRepository.delete(meetiId)
+        await deleteUTFiles(meeti.image)
+
+        return {
+            error: '',
+            success: 'Meeti eliminado correctamente'
+        }
     }
         
     }

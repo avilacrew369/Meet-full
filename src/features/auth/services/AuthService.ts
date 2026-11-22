@@ -1,8 +1,9 @@
-import { ForgotPasswordInput, SetPasswordInput, SignInInput, SignUpInput } from "@/src/features/auth/schemas/authSchema";
+import { ChangePasswordInput, ForgotPasswordInput, SetPasswordInput, SignInInput, SignUpInput } from "@/src/features/auth/schemas/authSchema";
 import { headers } from "next/headers"
 import { auth } from "@/src/lib/auth";
 import { authRepository, IAauthRepository } from "./AuthRepository";
 import { APIError } from "better-auth";
+import { checkPassword } from "@/src/shared/utils/auth";
 
 class AuthService {
 
@@ -138,6 +139,42 @@ class AuthService {
             error: '',
             success: ''
         }
+    }
+     async changePassword(input: ChangePasswordInput) {
+        const { newPassword, currentPassword, revokeOtherSessions } = input
+        const isValid = await checkPassword(currentPassword)
+        if(!isValid) {
+            return {
+                error: 'El Password es incorrecto',
+                success: '',
+            }
+        }
+        await auth.api.changePassword({
+            body: {
+                currentPassword,
+                newPassword
+            },
+            headers: await headers()
+        })
+        if(revokeOtherSessions) {
+            await auth.api.revokeOtherSessions({
+                headers: await headers()
+            })
+        }
+        return {
+            error: '',
+            success: 'El password se actualizo correctamente',
+        }
+    }
+    async getSessions() {
+        return auth.api.listSessions({
+            headers: await headers()
+        })
+    }
+    async getSession() {
+        return auth.api.getSession({
+            headers: await headers()
+        })
     }
  }
 

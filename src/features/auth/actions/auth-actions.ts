@@ -1,10 +1,11 @@
 "use server";
 
 import { authService } from "../services/AuthService";
-import { ForgotPasswordInput, ForgotPasswordSchema, SetPasswordInput, SetPasswordSchema, SignInInput, SignInSchema, SignUpInput, SignUpSchema } from "../schemas/authSchema";
+import { ChangePasswordInput, ChangePassworSchema, ForgotPasswordInput, ForgotPasswordSchema, SetPasswordInput, SetPasswordSchema, SignInInput, SignInSchema, SignUpInput, SignUpSchema } from "../schemas/authSchema";
 import { getClientIp } from "@/src/shared/utils/ip";
 import { ratelimit } from "@/src/lib/limiter";
 import { getMinutesDiffFromNow } from "@/src/shared/utils/date";
+import { requireAuth } from "@/src/lib/auth-server";
 
 export type SignUpActionResult = {
     error: string;
@@ -106,4 +107,18 @@ export async function setPasswordAction(input: SetPasswordInput, token: string) 
 
     const response = await authService.confirmPasswordReset(data.data, token)
     return response
+}
+export async function ChangePasswordAction(input: ChangePasswordInput) {
+    const { session } = await requireAuth()
+    const data = ChangePassworSchema.safeParse(input)
+    if(!session || !data.success) {
+        return {
+            error: 'Hubo un error',
+            success: '',
+        }
+    }
+
+    const result = await authService.changePassword(data.data)
+    return result
+   
 }

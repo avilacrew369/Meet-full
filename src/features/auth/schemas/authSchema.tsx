@@ -42,7 +42,7 @@ export const CheckPasswordSchema = z.object({
     password: z.string().min(1, {error: 'El password no puede ir vacio'})
 })
 
-export const changePassworSchema = BaseAuthSchema.pick({
+export const ChangePassworSchema = BaseAuthSchema.pick({
     currentPassword: true,
     newPassword: true,
     passwordConfirmation: true,
@@ -58,4 +58,4 @@ export type SignInInput = z.infer<typeof SignInSchema>
 export type ForgotPasswordInput = z.infer<typeof ForgotPasswordSchema>
 export type SetPasswordInput = z.infer<typeof SetPasswordSchema>
 export type CheckPasswordInput = z.infer<typeof CheckPasswordSchema>
-export type ChangePasswordInput = z.infer<typeof changePassworSchema>
+export type ChangePasswordInput = z.infer<typeof ChangePassworSchema>

@@ -3,6 +3,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { SelectMeeti } from "../types/meeti.types";
+import { useMeetiStore } from "../stores/meeti.store";
 
 type Props = {
   meeti: SelectMeeti
@@ -10,6 +11,7 @@ type Props = {
 
 export default function MeetiDropdownMenu({ meeti }: Props) {
 
+  const {setOpen, setMeeti } = useMeetiStore()
 
   return (
     <Menu as="div" className="relative flex-none">
@@ -49,7 +51,10 @@ export default function MeetiDropdownMenu({ meeti }: Props) {
         </MenuItem>
         <MenuItem>
           <button
-           
+           onClick={() => {
+              setOpen(true)
+              setMeeti(meeti)
+           }}
             type="button"
             className="block px-3 py-1 text-sm/6 text-red-600 data-focus:bg-gray-50 data-focus:outline-hidden dark:text-white dark:data-focus:bg-white/5 cursor-pointer"
           >

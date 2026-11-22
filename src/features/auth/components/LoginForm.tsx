@@ -6,16 +6,21 @@ import { SignInInput, SignInSchema } from '../schemas/authSchema';
 import { signInAction } from '../actions/auth-actions';
 import toast from 'react-hot-toast';
 import { redirect } from 'next/navigation';
+import { useState } from 'react';
 
 
 export default function LoginForm() {
 
-   const { register, handleSubmit, formState: { errors }, reset } = useForm({
+  const [locked, setLocked] = useState(false)
+
+   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm({
     resolver: zodResolver(SignInSchema),
     mode: 'all',
   })
 
   const onSubmit = async (data: SignInInput) => {
+    if(locked) return
+    setLocked(true)
    const { success, error} = await signInAction(data)
      if(error) {
        toast.error(error)
@@ -52,7 +57,8 @@ export default function LoginForm() {
         {errors.password && <FormError>{errors.password.message}</FormError>}
 
       <FormSubmit
-
+            value={isSubmitting ? 'Ingresando...' : 'Iniciar Sesion'}
+            disabled={isSubmitting || locked}
        />
     </Form>
   )
